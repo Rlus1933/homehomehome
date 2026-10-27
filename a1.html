@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 토글 버튼을 화면 오른쪽 위에 고정함 */
+        #toggleBtn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px 16px;
+            font-size: 16px;
+            z-index: 1000;      /* 다른 글자보다 위에 보이게 함 */
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- 색 깜빡임 on/off 버튼 -->
+    <button id="toggleBtn">정병 버튼 : OFF</button>
+
+    <h1>아니 집에 가고싶다고!!!!!!!!!</h1>
+
+    <!-- 랜덤 문구가 출력될 영역 -->
+    <div id="output"></div>
+
+    <script>
+        const time = 10;         // 색 바뀌는 간격(ms)
+        const minSize = 3;       // 글자 최소 크기(px)
+        const maxSize = 50;     // 글자 최대 크기(px)
+        const minGap = 10;       // 직전 크기와의 최소 차이
+
+        const messages = [
+            "집에 가고싶다",
+            "시발 진짜 집에 가고싶다",
+            "나는 진짜 집에 가고싶은데",
+            "왜 아무도 몰라주는데",
+            "제발 집에 보내주세요",
+            "아좆같다 걍",
+            "집가서 디비 자고싶다",
+            "다 죽여버린다 시발",
+            "다 나와",
+            "내가 제일 먼저 집에 간다",
+            "너무 행복해",
+            "집에가고싶어요",
+            "집가고싶다",
+            "왜나는여기에갇혀있어야하는거야?",
+            "나는 진짜 집에 가고싶다고",
+            "집집집집집집집",
+            "집에 집을 가면 집이 가는데 싶다를 집도?",
+            "집에 가자.",
+            "난 이곳을 탈출해야겠어",
+            "언제까지 여기 있어야하는 거야?",
+            "난 너무 힘이 든다고",
+            "이젠 제발 그만해",
+            "아무것도 하고싶지 않아",
+            "집에 가고싶단 말이야",
+            "영원히 자고 싶어",
+            "집에보내주세요",
+            "내가뭘잘못했는데?내가뭘잘못했냐고",
+            "내보내줘내보내줘내보내줘",
+            "열어열어열어열어",
+            "죽여버릴거야죽여버릴거라고",
+            "다죽어버려",
+            "다뒤져씨발새끼들아",
+            "죽어죽어죽어죽어",
+            "집에 가자 이제",
+            "이제 그만해",
+            "난 이제 한계야",
+            "뭘 더 하려는거야?",
+            "내가 여기서 더 움직일 수 있을 것 같아?",
+            "죽여버린다 죽일거라고",
+            "내가 못할 것 같아?",
+            "씨발 지랄하지마",
+            "본좌가 집에 가고싶도다.",
+            "내가 이르되 집에가고싶다",
+            "집",
+            "갈래",
+            "보내줘",
+            "싫어",
+            "야다!!!",
+            "?",
+            "!",
+            "~",
+            "?",
+            "!",
+            "~",
+            "?",
+            "!",
+            "~",
+            "?",
+            "!",
+            "~",
+            "?",
+            "!",
+            "~"
+        ];
+
+        // ===== 색 깜빡임 on/off 기능 =====
+
+        let isFlashing = false;   // 현재 깜빡임이 켜져 있는지 저장하는 변수
+        let flag = false;        // 빨강/검정 중 어느 쪽 차례인지 저장하는 변수
+        const toggleBtn = document.getElementById("toggleBtn");
+
+        // time(ms)마다 색을 번갈아 바꿈 (켜져 있을 때만 동작)
+        setInterval(() => {
+            if (!isFlashing) return;   // 꺼져 있으면 아무것도 하지 않음
+
+            if (flag) {
+                document.body.style.backgroundColor = "red";
+                document.body.style.color = "black";
+            } else {
+                document.body.style.backgroundColor = "black";
+                document.body.style.color = "white";
+            }
+            flag = !flag;              // 다음 번에는 반대 색으로 바꿈
+        }, time);
+
+        // 버튼을 누를 때마다 on/off를 전환함
+        toggleBtn.addEventListener("click", () => {
+            isFlashing = !isFlashing;  // true <-> false 반전
+
+            if (isFlashing) {
+                toggleBtn.textContent = "정병 버튼 : ON";
+            } else {
+                toggleBtn.textContent = "정병 버튼 : OFF";
+                // 꺼질 때 기본 색으로 되돌림
+                document.body.style.backgroundColor = "white";
+                document.body.style.color = "black";
+            }
+        });
+
+        // ===== 랜덤 문구 출력 기능 =====
+
+        const output = document.getElementById("output");
+        let home = prompt("얼마나 집으로 가고싶나요? 정수로 입력 : ");
+
+        // 입력값이 숫자가 아니거나 음수면 0으로 처리함
+        home = Number(home);
+        if (isNaN(home) || home < 0) {
+            home = 0;
+        }
+
+        // 직전 크기를 브라우저 저장소에서 꺼냄 (없으면 null)
+        let lastSize = null;
+        try {
+            const saved = localStorage.getItem("lastSize");
+            if (saved !== null) {
+                lastSize = Number(saved);  // 문자열 -> 숫자
+            }
+        } catch (e) {
+            // 저장소를 못 쓰는 환경이면 그냥 넘어감
+        }
+
+        for (let i = 0; i <= home; i++) {
+            // 직전 크기와 minGap 이상 차이 날 때까지 다시 뽑음
+            let randomSize;
+            do {
+                randomSize = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
+            } while (lastSize !== null && Math.abs(randomSize - lastSize) < minGap);
+
+            lastSize = randomSize;   // 다음 반복에서 비교할 값으로 갱신함
+
+            // 랜덤 문구를 뽑아서 output 영역 끝에 추가함
+            const randomIndex = Math.floor(Math.random() * messages.length);
+            output.insertAdjacentHTML(
+                "beforeend",
+                "<span style='font-size:" + randomSize + "px'>" + messages[randomIndex] + "</span>"
+            );
+        }
+
+        // 반복이 끝난 뒤 마지막 크기를 다음 새로고침을 위해 저장함
+        try {
+            localStorage.setItem("lastSize", lastSize);
+        } catch (e) {
+            // 저장 실패해도 화면 출력에는 영향 없음
+        }
+    </script>
+</body>
+</html>
